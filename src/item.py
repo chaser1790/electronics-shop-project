@@ -1,36 +1,36 @@
+import csv
+
 class Item:
-    """Класс, представляющий товар."""
-
-    pay_rate = 1  # уровень цен с учетом скидки
-    all_items = []  # список всех созданных объектов класса Item
-
     def __init__(self, name, price, quantity):
-        """
-        Инициализация объекта класса Item.
-
-        :param name: Название товара (str)
-        :param price: Цена товара (float)
-        :param quantity: Количество товара (int)
-        """
-        self.name = name
+        self._name = name
         self.price = price
         self.quantity = quantity
-        Item.all_items.append(self)
 
-    def calculate_total_price(self, pay_rate):
-        """
-        Рассчитать общую стоимость товара с учетом количества и уровня цен.
+    @property
+    def name(self):
+        return self._name
 
-        :param pay_rate: Уровень цен с учетом скидки (float)
-        :return: Общая стоимость товара (float)
-        """
-        return self.price * self.quantity * pay_rate
+    @name.setter
+    def name(self, value):
+        if len(value) <= 10:
+            self._name = value
+        else:
+            self._name = value[:10]
+            raise Exception("Длина наименования товара превышает 10 символов.")
 
-    def apply_discount(self, pay_rate):
-        """
-        Применить скидку к товару, обновляя его стоимость.
+    @classmethod
+    def instantiate_from_csv(cls, file_path):
+        items = []
+        with open(file_path, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                name = row['name']
+                price = float(row['price'])
+                quantity = int(row['quantity'])
+                item = cls(name, price, quantity)
+                items.append(item)
+        cls.all = items
 
-        :param pay_rate: Уровень цен с учетом скидки (float)
-        """
-        self.price = self.price * pay_rate
-        self.price = round(self.price, 2)
+    @staticmethod
+    def string_to_number(string):
+        return int(float(string))
