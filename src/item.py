@@ -77,3 +77,18 @@ class Item:
         :return: Число в виде целого числа (int)
         """
         return int(float(string))
+
+    def __repr__(self):
+        """
+        Магический метод для представления объекта класса в форме строки,
+        которую можно использовать для повторного создания объекта.
+        :return: Строка в формате "Item('name', price, quantity)"
+        """
+        return f"Item('{self._name}', {int(self.price)}, {self.quantity})"
+
+    def __str__(self):
+        """
+        Магический метод для представления объекта класса в виде удобочитаемой строки.
+        :return: Название товара (str)
+        """
+        return self._name
