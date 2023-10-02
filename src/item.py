@@ -92,3 +92,13 @@ class Item:
         :return: Название товара (str)
         """
         return self._name
+
+    def __add__(self, other):
+        """
+        Сложение двух товаров по их количеству.
+        :param other: другой объект класса Item.
+        :return: сумма количеств товаров.
+        """
+        if not isinstance(other, Item):
+            raise ValueError("Только экземпляры класса Item могут быть сложены.")
+        return self.quantity + other.quantity
