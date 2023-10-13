@@ -1,5 +1,9 @@
 import csv
 
+class InstantiateCSVError(Exception):
+    """Класс исключения, указывающего на ошибки при создании объектов из csv-файла."""
+    pass
+
 class Item:
     """Класс, представляющий товар."""
 
@@ -53,21 +57,37 @@ class Item:
         self.price = round(self.price, 2)
 
     @classmethod
-    def instantiate_from_csv(cls, file_path):
+    def instantiate_from_csv(cls, file_path='D:\\electronics-shop-project\\src\\items.csv'):
         """
         Создание объектов класса Item на основе данных из csv-файла.
         :param file_path: Путь к csv-файлу (str)
         """
-        items = []
-        with open(file_path, newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                name = row['name']
-                price = float(row['price'])
-                quantity = int(row['quantity'])
-                item = cls(name, price, quantity)
-                items.append(item)
-        cls.all = items
+        try:
+            items = []
+            with open(file_path, newline='') as csvfile:
+                reader = csv.DictReader(csvfile)
+
+                if set(reader.fieldnames) != {'name', 'price', 'quantity'}:
+                    raise InstantiateCSVError('Файл item.csv поврежден')
+
+                for row in reader:
+                    try:
+                        # Пытаемся преобразовать значения каждого поля к нужному типу.
+                        # Если какое-то из полей пустое или его значение неверно, вызываем исключение ValueError.
+                        name = row['name']
+                        price = float(row['price']) if row['price'] else None
+                        quantity = int(row['quantity']) if row['quantity'] else None
+                        if not all([name, price, quantity]):
+                            raise ValueError
+                        item = cls(name, price, quantity)
+                        items.append(item)
+                    except ValueError:
+                        # Если в процессе чтения и преобразования данных возникла ошибка, делаем вывод, что файл поврежден.
+                        raise InstantiateCSVError('Файл item.csv поврежден')
+
+                cls.all_items = items
+        except FileNotFoundError:
+            raise FileNotFoundError('Отсутствует файл item.csv')
 
     @staticmethod
     def string_to_number(string):
